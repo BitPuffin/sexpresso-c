@@ -1,0 +1,42 @@
+#+TITLE: sexpresso-c
+
+Sexpresso is a C centric [[https://en.wikipedia.org/wiki/S-expression][s-expression]] library. It is the C version of my C++ library.
+
+Sexpresso aims to be very simple, nodes are parsed either as s-expressions or strings, even
+a number would be parsed a string, so if you expect a node to be a number, please convert the
+string to a number!
+
+
+* S-expression primer
+
+Confused? I mean what *iiiis* an s-expression?
+
+s-expressions come from the lisp family of programming languages, it is an
+incredibly simple notation for *lists*, however, since these lists can be nested
+it also means that they are great for representing hierarchies as well, which makes
+it an excellent replacement for XML or JSON.
+
+The notation is simply to surround the elements, separated by whitespace in parentheses,
+like this:
+
+#+BEGIN_SRC lisp
+(here we have an s-expression)
+#+END_SRC
+
+What you see here is a list of 5 symbols: ~here~, ~we~, ~have~, ~an~ and ~s-expression~.
+Like I said you can also put s-expressions inside s-expressions to create hierarchies:
+
+#+BEGIN_SRC lisp
+(my-objects 
+  (object-a (name "isak andersson") 
+            (countries swe uk)) 
+  (object-b (name "joe bain")
+            (countries uk)))
+#+END_SRC
+
+* FAQ
+** Why should I use s-expressions
+because they are more elegant and simple than XML or JSON. Much less work required to parse. And they look nice! (subjective)
+
+* Future direction
+Make it a header-only library instead perhaps?
