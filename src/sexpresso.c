@@ -14,7 +14,7 @@ sexpresso_sexp sexpressoCreateString(char const* Str) {
 
 sexpresso_sexp sexpressoCreateStringUnescaped(char const* Str) {
 	size_t Length = strlen(Str) + 1;
-	char* Val = (char*)malloc(sizeof(char)*Length);
+	char* Val = malloc(sizeof(char)*Length);
 	strncpy(Val, Str, Length);
 	return sexpressoCreateStringUnescapedMove(Val);
 }
@@ -31,7 +31,7 @@ static void copySexp(sexpresso_sexp* Dest, sexpresso_sexp* Sexp) {
 	case SEXPRESSO_SEXP:
 		Dest->Kind = SEXPRESSO_SEXP;
 		Dest->Value.Sexp.Count = Sexp->Value.Sexp.Count;
-		Dest->Value.Sexp.Sexps = (sexpresso_sexp*)malloc(sizeof(sexpresso_sexp) * Sexp->Value.Sexp.Count);
+		Dest->Value.Sexp.Sexps = malloc(sizeof(sexpresso_sexp) * Sexp->Value.Sexp.Count);
 		{
 			size_t i;
 			for(i=0; i<Sexp->Value.Sexp.Count; ++i)
