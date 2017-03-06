@@ -18,6 +18,22 @@ struct sexpresso_sexp_s {
 	} Value;
 };
 
+typedef enum {
+	SEXPRESSO_NO_ERROR,
+	SEXPRESSO_ERROR_EXCESS_CLOSING_PARENTHESES,
+	SEXPRESSO_ERROR_UNEXPECTED_NEWLINE_IN_STRING_LITERAL,
+	SEXPRESSO_ERROR_UNTERMINATED_STRING_LITERAL,
+	SEXPRESSO_ERROR_UNFINISHED_ESCAPE_SEQUENCE_AT_END_OF_STRING,
+	SEXPRESSO_ERROR_INVALID_ESCAPE_CHARACTER,
+	SEXPRESSO_ERROR_INCOMPLETE_SEXP
+} sexpresso_error_code;
+
+typedef struct {
+	sexpresso_error_code Code;
+	size_t Line;
+	size_t Column;
+} sexpresso_error;
+
 sexpresso_sexp sexpressoCreateString(char const* Str);
 sexpresso_sexp sexpressoCreateStringUnescaped(char const* cStr);
 sexpresso_sexp sexpressoCreateStringUnescapedMove(char const* Str);
@@ -34,5 +50,5 @@ int sexpressoIsString(sexpresso_sexp const* Sexp);
 int sexpressoIsSexp(sexpresso_sexp const* Sexp);
 int sexpressoIsNil(sexpresso_sexp const* Sexp);
 
-sexpresso_sexp* sexpressoParse(const char* Str, const char** Error);
+int sexpressoParse(sexpresso_sexp* Dest, const char* Str, sexpresso_error* Err);
 const char* sexpressoEscape(const char* Str);
