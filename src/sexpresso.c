@@ -93,11 +93,11 @@ size_t sexpressoChildCount(sexpresso_sexp const* Sexp) {
 	}
 }
 
-static const size_t EscapeCharCount = 11;
-static char const* const EscapeChars = "n\"'\\ftrvba?";
-static char const* const EscapeVals  = "\n\"'\\\f\t\r\v\b\a\?";
-/* static const char* EscapeChars = { 'n',  '"', '\'', '\\',  'f',  't',  'r',  'v',  'b',  'a',  '?' }; */
-/* static const char* EscapeVals  = { '\n', '"', '\'', '\\', '\f', '\t', '\r', '\v', '\b', '\a', '\?' }; */
+static const size_t ESCAPE_CHAR_COUNT = 11;
+static char const* const ESCAPE_CHARS = "n\"'\\ftrvba?";
+static char const* const ESCAPE_VALS  = "\n\"'\\\f\t\r\v\b\a\?";
+/* static const char* ESCAPE_CHARS = { 'n',  '"', '\'', '\\',  'f',  't',  'r',  'v',  'b',  'a',  '?' }; */
+/* static const char* ESCAPE_VALS  = { '\n', '"', '\'', '\\', '\f', '\t', '\r', '\v', '\b', '\a', '\?' }; */
 
 struct string_build {
 	size_t Cap;
@@ -132,9 +132,9 @@ static void insertStringValue(struct string_build* Build, const char* Str) {
 		insertChar(Build, '"');
 		for(c=Str; c < Str + Len; ++c) {
 			char const* esc;
-			for(esc=EscapeVals; esc < EscapeVals + EscapeCharCount; ++esc) if(*esc == *c) break;
-			if(esc == EscapeVals + EscapeCharCount) insertChar(Build, *c);
-			else { insertChar(Build, '\\'); insertChar(Build, *(EscapeChars + (esc - EscapeVals))); }
+			for(esc=ESCAPE_VALS; esc < ESCAPE_VALS + ESCAPE_CHAR_COUNT; ++esc) if(*esc == *c) break;
+			if(esc == ESCAPE_VALS + ESCAPE_CHAR_COUNT) insertChar(Build, *c);
+			else { insertChar(Build, '\\'); insertChar(Build, *(ESCAPE_CHARS + (esc - ESCAPE_VALS))); }
 		}
 		insertChar(Build, '"');
 	}
@@ -273,16 +273,16 @@ int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) 
 					}
 					{
 						size_t pos;
-						for(pos=0; pos<EscapeCharCount; ++pos) {
-							if(EscapeChars[pos] == *Iter) break;
+						for(pos=0; pos<ESCAPE_CHAR_COUNT; ++pos) {
+							if(ESCAPE_CHARS[pos] == *Iter) break;
 						}
-						if(EscapeCharCount == pos) {
+						if(ESCAPE_CHAR_COUNT == pos) {
 							if(Err != NULL) {
 								Err->Code = SEXPRESSO_ERROR_INVALID_ESCAPE_CHARACTER;
 							}
 							return 1;
 						}
-						ResultStr[Start - Iter] = EscapeVals[pos];
+						ResultStr[Start - Iter] = ESCAPE_VALS[pos];
 						break;
 					}
 				}
