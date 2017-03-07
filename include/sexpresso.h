@@ -51,6 +51,7 @@ char const* sexpressoToString(sexpresso_sexp const* Sexp);
 int sexpressoIsString(sexpresso_sexp const* Sexp);
 int sexpressoIsSexp(sexpresso_sexp const* Sexp);
 int sexpressoIsNil(sexpresso_sexp const* Sexp);
+int sexpressoEqual(sexpresso_sexp const* A, sexpresso_sexp const* B);
 
 void sexpressoDestroy(sexpresso_sexp* Sexp);
 

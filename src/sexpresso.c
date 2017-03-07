@@ -202,6 +202,10 @@ int sexpressoIsNil(sexpresso_sexp const* Sexp) {
 	return Sexp->Kind == SEXPRESSO_SEXP && Sexp->Value.Sexp.Count == 0;
 }
 
+int sexpressoEqual(sexpresso_sexp const* A, sexpresso_sexp const* B) {
+	return 1;
+}
+
 void sexpressoDestroy(sexpresso_sexp* Sexp) {
 }
 
@@ -304,9 +308,9 @@ int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) 
 			char* Sym;
 			size_t SymSize;
 			for(SymEnd = It; *SymEnd != '\0' && !isspace(*SymEnd) && *SymEnd != ')'; ++SymEnd) {}
-			SymSize = It - SymEnd + 1; /* @XXX: I suspect this math is wrong, needs testing */
+			SymSize = SymEnd - It + 1;
 			Sym = malloc(sizeof(char)*SymSize);
-			strncpy(Sym, It, SymSize - 2);
+			strncpy(Sym, It, SymSize - 1);
 			Sym[SymSize-1] = '\0';
 			sexpressoAddChildStringUnescapedMove(&Stack->Sexp, Sym);
 			NextIt = SymEnd;
@@ -326,5 +330,5 @@ int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) 
 }
 
 const char* sexpressoEscape(char const* str) {
-	return NULL;
+	return str;
 }
