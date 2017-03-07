@@ -226,6 +226,8 @@ int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) 
 		return 1;
 	}
 
+	*Dest = Stack->Sexp;
+
 	return 0;
 }
 
