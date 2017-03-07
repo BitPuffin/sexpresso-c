@@ -46,9 +46,13 @@ void sexpressoAddChildStringUnescapedMove(sexpresso_sexp* Dest, char const* Str)
 
 size_t sexpressoChildCount(sexpresso_sexp const* Sexp);
 
+char const* sexpressoToString(sexpresso_sexp const* Sexp);
+
 int sexpressoIsString(sexpresso_sexp const* Sexp);
 int sexpressoIsSexp(sexpresso_sexp const* Sexp);
 int sexpressoIsNil(sexpresso_sexp const* Sexp);
+
+void sexpressoDestroy(sexpresso_sexp* Sexp);
 
 int sexpressoParse(sexpresso_sexp* Dest, const char* Str, sexpresso_error* Err);
 const char* sexpressoEscape(const char* Str);

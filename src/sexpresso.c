@@ -93,6 +93,103 @@ size_t sexpressoChildCount(sexpresso_sexp const* Sexp) {
 	}
 }
 
+static const size_t EscapeCharCount = 11;
+static char const* const EscapeChars = "n\"'\\ftrvba?";
+static char const* const EscapeVals  = "\n\"'\\\f\t\r\v\b\a\?";
+/* static const char* EscapeChars = { 'n',  '"', '\'', '\\',  'f',  't',  'r',  'v',  'b',  'a',  '?' }; */
+/* static const char* EscapeVals  = { '\n', '"', '\'', '\\', '\f', '\t', '\r', '\v', '\b', '\a', '\?' }; */
+
+struct string_build {
+	size_t Cap;
+	size_t Count;
+	char* Str;
+};
+static const size_t INITIAL_STRING_CAP   = 1024;
+static const float  STRING_GROWTH_FACTOR = 1.5f;
+
+static void grow(struct string_build* Build) {
+	Build->Cap *= STRING_GROWTH_FACTOR;
+	Build->Str = realloc(Build->Str, sizeof(char)*Build->Cap);
+}
+
+static void insertChar(struct string_build* Build, char c) {
+	if(Build->Count == Build->Cap) grow(Build);
+	Build->Str[Build->Count] = c;
+	++Build->Count;
+}
+
+static void insertStringValue(struct string_build* Build, const char* Str) {
+	size_t Len = strlen(Str);
+	char const* c;
+	if(0 == Len) { insertChar(Build, '"'); insertChar(Build, '"'); return; }
+	for(c=Str; c < Str + Len; ++c) if(' ' == *c) break;
+	if(c == Str + Len) {
+		if((Build->Count + Len) >= Build->Cap) grow(Build);
+		strncpy(Build->Str + Build->Count, Str, Len);
+		Build->Count += Len;
+	} else {
+		if((Build->Count + Len + 2) >= Build->Cap) grow(Build);
+		insertChar(Build, '"');
+		for(c=Str; c < Str + Len; ++c) {
+			char const* esc;
+			for(esc=EscapeVals; esc < EscapeVals + EscapeCharCount; ++esc) if(*esc == *c) break;
+			if(esc == EscapeVals + EscapeCharCount) insertChar(Build, *c);
+			else { insertChar(Build, '\\'); insertChar(Build, *(EscapeChars + (esc - EscapeVals))); }
+		}
+		insertChar(Build, '"');
+	}
+}
+
+static void toStringImpl(struct string_build* Build, sexpresso_sexp* Sexp) {
+	switch(Sexp->Kind) {
+	case SEXPRESSO_STRING:
+		insertStringValue(Build, Sexp->Value.Str);
+		break;
+	case SEXPRESSO_SEXP:
+		insertChar(Build, '(');
+		switch(Sexp->Value.Sexp.Count) {
+		case 0:
+			break;
+		case 1:
+			toStringImpl(Build, &Sexp->Value.Sexp.Sexps[0]);
+			break;
+		default:{
+			sexpresso_sexp* i;
+			for(i=Sexp->Value.Sexp.Sexps; i < Sexp->Value.Sexp.Sexps + Sexp->Value.Sexp.Count; ++i) {
+				toStringImpl(Build, i);
+				if(i != Sexp->Value.Sexp.Sexps + Sexp->Value.Sexp.Count - 1) insertChar(Build, ' ');
+			}
+		}
+		}
+		insertChar(Build, ')');
+	}
+}
+
+char const* sexpressoToString(sexpresso_sexp const* Sexp) {
+	struct string_build Build;
+	Build.Cap = INITIAL_STRING_CAP;
+	Build.Count = 0;
+	Build.Str = malloc(sizeof(char) * Build.Cap);
+
+	switch(Sexp->Kind) {
+	case SEXPRESSO_STRING:
+		insertStringValue(&Build, Sexp->Value.Str);
+		break;
+	case SEXPRESSO_SEXP: {
+		sexpresso_sexp* i;
+		for(i=Sexp->Value.Sexp.Sexps; i<Sexp->Value.Sexp.Sexps + Sexp->Value.Sexp.Count; ++i) {
+			toStringImpl(&Build, i);
+			if(i != Sexp->Value.Sexp.Sexps + Sexp->Value.Sexp.Count - 1) insertChar(&Build, ' ');
+		}
+		break;
+	}
+	}
+
+	Build.Str = realloc(Build.Str, sizeof(char)*Build.Count + 1);
+	Build.Str[Build.Count] = '\0';
+	return Build.Str;
+}
+
 int sexpressoIsString(sexpresso_sexp const* Sexp) {
 	return Sexp->Kind == SEXPRESSO_STRING;
 }
@@ -105,16 +202,13 @@ int sexpressoIsNil(sexpresso_sexp const* Sexp) {
 	return Sexp->Kind == SEXPRESSO_SEXP && Sexp->Value.Sexp.Count == 0;
 }
 
+void sexpressoDestroy(sexpresso_sexp* Sexp) {
+}
+
 struct stack {
 	sexpresso_sexp Sexp;
 	struct stack* Prev;
 };
-
-static const size_t EscapeCharCount = 11;
-static const char* EscapeChars = "n\"'\\ftrvba?";
-static const char* EscapeVals  = "\n\"'\\\f\t\r\v\b\a\?";
-/* static const char* EscapeChars = { 'n',  '"', '\'', '\\',  'f',  't',  'r',  'v',  'b',  'a',  '?' }; */
-/* static const char* EscapeVals  = { '\n', '"', '\'', '\\', '\f', '\t', '\r', '\v', '\b', '\a', '\?' }; */
 
 int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) {
 	struct stack* Stack = calloc(1, sizeof(struct stack));
