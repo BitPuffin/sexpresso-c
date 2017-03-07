@@ -94,12 +94,25 @@ static void equality() {
 	sexpressoDestroy(&Outer);
 }
 
+static void inequality() {
+	sexpresso_sexp A, B = {0};
+
+	assert_false(sexpressoParse(&A, "this (one is nothing)", NULL));
+	assert_false(sexpressoParse(&B, "like the (other)", NULL));
+
+	assert_false(sexpressoEqual(&A, &B));
+
+	sexpressoDestroy(&A);
+	sexpressoDestroy(&B);
+}
+
 int main(int argc, char** argv) {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_empty_string),
 		cmocka_unit_test(test_empty_sexp),
 		cmocka_unit_test(test_multiple_empty_sexp),
 		cmocka_unit_test(equality),
+		cmocka_unit_test(inequality),
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
