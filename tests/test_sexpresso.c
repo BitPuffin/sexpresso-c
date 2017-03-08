@@ -113,7 +113,7 @@ static void string_literal() {
 	assert_int_equal(Sexp.Value.Sexp.Sexps[0].Kind, SEXPRESSO_STRING);
 	assert_int_equal(Sexp.Value.Sexp.Sexps[1].Kind, SEXPRESSO_STRING);
 	assert_string_equal(Sexp.Value.Sexp.Sexps[0].Value.Str, "hello world");
-	assert_string_equal(Sexp.Value.Sexp.Sexps[0].Value.Str, "hehe");
+	assert_string_equal(Sexp.Value.Sexp.Sexps[1].Value.Str, "hehe");
 	sexpressoDestroy(&Sexp);
 }
 
