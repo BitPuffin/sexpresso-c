@@ -106,6 +106,17 @@ static void inequality() {
 	sexpressoDestroy(&B);
 }
 
+static void string_literal() {
+	sexpresso_sexp Sexp;
+	assert_false(sexpressoParse(&Sexp, "\"hello world\" hehe", NULL));
+	assert_int_equal(sexpressoChildCount(&Sexp), 2);
+	assert_int_equal(Sexp.Value.Sexp.Sexps[0].Kind, SEXPRESSO_STRING);
+	assert_int_equal(Sexp.Value.Sexp.Sexps[1].Kind, SEXPRESSO_STRING);
+	assert_string_equal(Sexp.Value.Sexp.Sexps[0].Value.Str, "hello world");
+	assert_string_equal(Sexp.Value.Sexp.Sexps[0].Value.Str, "hehe");
+	sexpressoDestroy(&Sexp);
+}
+
 int main(int argc, char** argv) {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_empty_string),
@@ -113,6 +124,7 @@ int main(int argc, char** argv) {
 		cmocka_unit_test(test_multiple_empty_sexp),
 		cmocka_unit_test(equality),
 		cmocka_unit_test(inequality),
+		cmocka_unit_test(string_literal),
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
