@@ -203,7 +203,21 @@ int sexpressoIsNil(sexpresso_sexp const* Sexp) {
 }
 
 int sexpressoEqual(sexpresso_sexp const* A, sexpresso_sexp const* B) {
-	return 1;
+	if(A->Kind != B->Kind) return false;
+	switch(A->Kind) {
+	case SEXPRESSO_SEXP:
+		if(A->Value.Sexp.Count != B->Value.Sexp.Count) return false;
+		
+		{
+			size_t i;
+			for(i=0; i<A->Value.Sexp.Count; ++i) {
+				if(!sexpressoEqual(&A->Value.Sexp.Sexps[i], &B->Value.Sexp.Sexps[i])) return false;
+			}
+			return true;
+		}
+	case SEXPRESSO_STRING:
+		return strcmp(A->Value.Str, B->Value.Str) == 0;
+	}
 }
 
 void sexpressoDestroy(sexpresso_sexp* Sexp) {
