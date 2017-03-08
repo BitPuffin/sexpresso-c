@@ -93,6 +93,10 @@ size_t sexpressoChildCount(sexpresso_sexp const* Sexp) {
 	}
 }
 
+sexpresso_sexp* sexpressoGetChildByPath(sexpresso_sexp const* Sexp, char const* path) {
+	return NULL;
+}
+
 static const size_t ESCAPE_CHAR_COUNT = 11;
 static char const* const ESCAPE_CHARS = "n\"'\\ftrvba?";
 static char const* const ESCAPE_VALS  = "\n\"'\\\f\t\r\v\b\a\?";
@@ -300,12 +304,12 @@ int sexpressoParse(sexpresso_sexp* Dest, char const* Str, sexpresso_error* Err) 
 							}
 							return 1;
 						}
-						ResultStr[Start - Iter] = ESCAPE_VALS[pos];
+						ResultStr[Iter - Start] = ESCAPE_VALS[pos];
 						break;
 					}
 				}
 				default:
-					ResultStr[Start - Iter] = *Iter;
+					ResultStr[Iter - Start] = *Iter;
 				}
 			}
 			ResultStr[StrSize-1] = '\0';
