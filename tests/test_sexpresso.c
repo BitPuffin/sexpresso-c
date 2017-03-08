@@ -117,6 +117,39 @@ static void string_literal() {
 	sexpressoDestroy(&Sexp);
 }
 
+static void hierarchy_query() {
+	sexpresso_sexp Sexp, Test;
+	assert_false(sexpressoParse(&Sexp, "(myshit (a (name me) (age 2)) (b (name you) (age 1)))", NULL));
+
+	assert_false(sexpressoParse(&Test, "name me", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/a/name"), &Test));
+	sexpressoDestroy(&Test);
+
+	assert_false(sexpressoParse(&Test, "age 2", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/a/age"), &Test));
+	sexpressoDestroy(&Test);
+
+	assert_false(sexpressoParse(&Test, "a (name me) (age 2)", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/a"), &Test));
+	sexpressoDestroy(&Test);
+
+
+	assert_false(sexpressoParse(&Test, "name you", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/b/name"), &Test));
+	sexpressoDestroy(&Test);
+
+	assert_false(sexpressoParse(&Test, "age 1", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/b/age"), &Test));
+	sexpressoDestroy(&Test);
+
+	assert_false(sexpressoParse(&Test, "b (name you) (age 1)", NULL));
+	assert_true(sexpressoEqual(sexpressoGetChildByPath(&Sexp, "myshit/b"), &Test));
+	sexpressoDestroy(&Test);
+
+	assert_null(sexpressoGetChildByPath(&Sexp, "this/does/not/even/exist/dummy"));
+	sexpressoDestroy(&Sexp);
+}
+
 int main(int argc, char** argv) {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_empty_string),
@@ -125,6 +158,7 @@ int main(int argc, char** argv) {
 		cmocka_unit_test(equality),
 		cmocka_unit_test(inequality),
 		cmocka_unit_test(string_literal),
+		cmocka_unit_test(hierarchy_query),
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

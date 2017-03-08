@@ -94,7 +94,7 @@ size_t sexpressoChildCount(sexpresso_sexp const* Sexp) {
 }
 
 sexpresso_sexp* sexpressoGetChildByPath(sexpresso_sexp const* Sexp, char const* path) {
-	return NULL;
+	return (sexpresso_sexp*)Sexp;
 }
 
 static const size_t ESCAPE_CHAR_COUNT = 11;
