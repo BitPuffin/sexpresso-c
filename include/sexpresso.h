@@ -1,4 +1,4 @@
-/* Author: Isak ANdersson 2017 bitpuffin dot com */
+/* Author: Isak Andersson 2017 bitpuffin dot com */
 
 /* Dependencies */
 /* #include <stddef.h> */
